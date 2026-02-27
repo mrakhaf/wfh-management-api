@@ -7,7 +7,7 @@ export class JwtAuthMiddleware implements NestMiddleware {
   private readonly authServiceUrl: string;
 
   constructor() {
-    this.authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:3000';
+    this.authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:3000/check-token';
   }
 
   async use(req: Request, res: Response, next: NextFunction) {
@@ -20,33 +20,22 @@ export class JwtAuthMiddleware implements NestMiddleware {
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
     try {
-      // For this implementation, we'll parse the JWT directly since the payload
-      // structure doesn't match the expected format with 'valid' and 'user' fields
-      
-      // Decode JWT payload
-      const parts = token.split('.');
-      if (parts.length !== 3) {
-        return res.status(401).json({ message: 'Invalid token format' });
+      // Hit the external check-token API
+      const response = await axios.default.get(this.authServiceUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const result = response.data;
+
+      // Check if token is valid
+      if (!result.valid) {
+        return res.status(401).json({ message: 'Invalid token' });
       }
 
-      const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
-      
-      // Check if payload has the required user fields
-      if (!payload || !payload.position || !payload.email) {
-        return res.status(401).json({ message: 'Invalid token payload' });
-      }
-
-      // Attach user info to request (using the payload directly since it contains user data)
-      req['user'] = {
-        id: payload.id,
-        email: payload.email,
-        fullname: payload.fullname,
-        phone_number: payload.phone_number,
-        position: payload.position,
-        photo_url: payload.photo_url,
-        created_at: payload.created_at,
-        updated_at: payload.updated_at
-      };
+      // Attach user info to request from the API response
+      req['user'] = result.user;
       
       next();
     } catch (error) {
