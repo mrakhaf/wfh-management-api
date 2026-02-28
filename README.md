@@ -291,7 +291,7 @@ Get attendance records for a specific user within a date range.
 
 ### 4. Dashboard Analytics
 
-Get comprehensive dashboard data for attendance analytics.
+Get comprehensive dashboard data for attendance analytics. **⚠️ Requires HRD Dashboard Guard**
 
 **GET** `/attendance/dashboard`
 
@@ -306,21 +306,68 @@ Get comprehensive dashboard data for attendance analytics.
 {
   "success": true,
   "data": {
-    "totalUsersAttended": 50,
-    "totalTapIn": 1200,
-    "totalCompleted": 1150,
-    "attendances": [
+    "month": 2,
+    "year": 2026,
+    "total_users": 50,
+    "days_in_month": 28,
+    "current_page": 1,
+    "total_page": 3,
+    "data": [
       {
-        "id": "clx123",
-        "userId": "123",
-        "tapIn": "2024-01-15T08:00:00.000Z",
-        "tapOut": "2024-01-15T17:00:00.000Z",
-        "createdAt": "2024-01-15T08:00:00.000Z",
-        "updatedAt": "2024-01-15T17:00:00.000Z"
+        "id": "user-123",
+        "name": "John Doe",
+        "total_present": 20,
+        "total_completed": 18,
+        "total_tap_in_only": 2,
+        "total_absent": 8,
+        "1": "COMPLETED",
+        "2": "TAP_IN_ONLY",
+        "3": "ABSENT",
+        "4": "COMPLETED",
+        "5": "COMPLETED",
+        "6": "COMPLETED",
+        "7": "COMPLETED",
+        "8": "COMPLETED",
+        "9": "COMPLETED",
+        "10": "COMPLETED",
+        "11": "COMPLETED",
+        "12": "COMPLETED",
+        "13": "COMPLETED",
+        "14": "COMPLETED",
+        "15": "COMPLETED",
+        "16": "COMPLETED",
+        "17": "COMPLETED",
+        "18": "COMPLETED",
+        "19": "COMPLETED",
+        "20": "COMPLETED",
+        "21": "ABSENT",
+        "22": "ABSENT",
+        "23": "ABSENT",
+        "24": "ABSENT",
+        "25": "ABSENT",
+        "26": "ABSENT",
+        "27": "ABSENT",
+        "28": "ABSENT"
       }
     ]
   },
-  "timestamp": "2024-01-15T10:00:00.000Z"
+  "timestamp": "2026-02-15T10:00:00.000Z"
+}
+```
+
+**Daily Status Values:**
+- `COMPLETED`: User has both tap in and tap out
+- `TAP_IN_ONLY`: User has only tap in (no tap out yet)
+- `ABSENT`: User has no attendance record for that day
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "statusCode": 400,
+  "timestamp": "2026-02-15T10:00:00.000Z",
+  "path": "/attendance/dashboard",
+  "message": "Invalid month or year parameters"
 }
 ```
 
@@ -350,7 +397,7 @@ curl -X GET "http://localhost:3000/attendance/user/123?start_date=2024-01-01&end
 
 #### Dashboard Analytics
 ```bash
-curl -X GET "http://localhost:3000/attendance/dashboard?month=1&year=2024&page=1&limit=10" \
+curl -X GET "http://localhost:3000/attendance/dashboard?month=2&year=2026&page=1&limit=10" \
   -H "Authorization: Bearer your-jwt-token"
 ```
 
